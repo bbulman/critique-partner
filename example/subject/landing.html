@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spark — Seamless team collaboration, unlocked</title>
+  <style>
+    /* Intentionally flawed example for the critique-partner agent.
+       See ../README.md for the violations this file plants. */
+
+    :root {
+      --bg: #ffffff;
+      --ink: #000000;
+      --muted: #555;
+      --accent-a: #2563eb;
+      --accent-b: #7c3aed;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    .hero {
+      padding: 120px 24px 96px;
+      text-align: center;
+      background-image: url("https://images.example.com/team-celebrating-fullbleed.jpg");
+      background-size: cover;
+      background-position: center;
+      color: white;
+    }
+
+    .hero h1 {
+      font-size: 56px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin: 0 0 16px;
+      background: linear-gradient(90deg, #2563eb, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 20px;
+      max-width: 640px;
+      margin: 0 auto 32px;
+      color: rgba(255,255,255,0.95);
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 14px 28px;
+      border: 2px solid #2563eb;
+      border-radius: 6px;
+      background: linear-gradient(90deg, #2563eb, #7c3aed);
+      color: white;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 16px;
+    }
+
+    .btn-secondary {
+      display: inline-block;
+      padding: 13px 27px;
+      border: 2px solid #2563eb;
+      border-radius: 6px;
+      background: white;
+      color: #2563eb;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 16px;
+      margin-left: 12px;
+    }
+
+    .features {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 96px 24px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    .card {
+      padding: 32px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .card h3 {
+      font-size: 22px;
+      margin: 0 0 12px;
+      color: #2563eb;
+    }
+
+    .card p {
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .stats {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 64px 24px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      text-align: center;
+    }
+
+    .stats .num {
+      font-size: 48px;
+      font-weight: 800;
+      background: linear-gradient(90deg, #2563eb, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stats .label {
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .cta-band {
+      margin: 64px 24px;
+      padding: 64px 32px;
+      text-align: center;
+      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      color: white;
+      border-radius: 16px;
+    }
+
+    .cta-band h2 {
+      font-size: 36px;
+      font-weight: 800;
+      margin: 0 0 16px;
+    }
+
+    .cta-band p {
+      font-size: 18px;
+      margin: 0 0 24px;
+      opacity: 0.95;
+    }
+
+    footer {
+      padding: 32px 24px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+  <section class="hero">
+    <h1>Seamless team collaboration, unlocked ✨</h1>
+    <p>Spark is the powerful, AI-native workspace that transforms how your team ships work together. Leverage the synergy of integrated tools to delight your stakeholders.</p>
+    <a class="btn-primary" href="#">Start your free trial!</a>
+    <a class="btn-secondary" href="#">Watch the demo!</a>
+  </section>
+
+  <section class="features">
+    <div class="card">
+      <h3>Real-time collab</h3>
+      <p>Work together on the same document, project, or canvas — instantly synced across every device.</p>
+    </div>
+    <div class="card">
+      <h3>AI-powered insights</h3>
+      <p>Our intelligent assistant surfaces what matters, when it matters, so you can focus on what's next.</p>
+    </div>
+    <div class="card">
+      <h3>Enterprise-ready</h3>
+      <p>SOC 2 certified, GDPR compliant, with single sign-on and granular permissions built in.</p>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div>
+      <div class="num">10k+</div>
+      <div class="label">Teams</div>
+    </div>
+    <div>
+      <div class="num">99.99%</div>
+      <div class="label">Uptime</div>
+    </div>
+    <div>
+      <div class="num">3.2x</div>
+      <div class="label">Faster shipping</div>
+    </div>
+    <div>
+      <div class="num">$0</div>
+      <div class="label">To start</div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <h2>Ready to unlock your team's potential?</h2>
+    <p>Join 10,000+ teams already using Spark to ship better, faster.</p>
+    <a class="btn-primary" href="#">Get started — it's free!</a>
+  </section>
+
+  <footer>
+    © 2026 Spark. Made with ✨ in San Francisco.
+  </footer>
+
+</body>
+</html>

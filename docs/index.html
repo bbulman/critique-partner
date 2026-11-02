@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>critique-partner: a design critic that argues from your rules</title>
+<meta name="description" content="A design critic for Claude Code. Point it at a URL: it grills you about the page, then writes a critique where every issue quotes your own rules, and loops until a script and a second critic can't knock it down.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF7F2;
+    --surface: #FFFFFF;
+    --ink: #1C1A17;
+    --muted: #5E5850;
+    --line: #E7E1D8;
+    --accent: #B83A3A;
+    --fill: #E54D4D;
+    --on-fill: #FFFFFF;
+    --code: #F2EDE5;
+    --serif: "Fraunces", Georgia, serif;
+    --sans: "Inter", system-ui, -apple-system, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151311;
+      --surface: #1C1A17;
+      --ink: #EEE8DF;
+      --muted: #A9A195;
+      --line: #2E2A25;
+      --accent: #F0918B;
+      --fill: #E54D4D;
+      --on-fill: #FFFFFF;
+      --code: #211E1A;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.6 var(--sans); }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:focus-visible, .button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+  header.top { display: flex; justify-content: space-between; align-items: center; padding: 24px 0; }
+  .mark { font: 600 1rem var(--sans); color: var(--ink); text-decoration: none; letter-spacing: 0.01em; }
+  .top nav a { color: var(--muted); text-decoration: none; font-size: 0.95rem; }
+  .top nav a:hover { color: var(--ink); }
+
+  .hero { padding: 72px 0 88px; }
+  .hero h1 { font: 600 clamp(2.5rem, 6vw, 4.5rem)/1.05 var(--serif); letter-spacing: -0.02em; margin: 0 0 28px; max-width: 14ch; }
+  .hero p.lede { font-size: clamp(1.1rem, 2vw, 1.3rem); color: var(--muted); max-width: 40rem; margin: 0 0 40px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+  /* 19px bold counts as large text, so white on the brand red passes AA at 3:1. */
+  .button { display: inline-block; background: var(--fill); color: var(--on-fill); text-decoration: none; font: 700 1.2rem var(--sans); padding: 13px 28px; border-radius: 999px; }
+  .button:hover { filter: brightness(0.94); }
+  .cmd { font: 500 0.95rem var(--mono); background: var(--code); border: 1px solid var(--line); border-radius: 8px; padding: 13px 18px; }
+
+  section { padding: 72px 0; border-top: 1px solid var(--line); }
+  h2 { font: 600 clamp(1.7rem, 3.2vw, 2.4rem)/1.15 var(--serif); letter-spacing: -0.01em; margin: 0 0 12px; }
+  .intro { color: var(--muted); max-width: 40rem; margin: 0 0 40px; }
+
+  ol.steps { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px 40px; counter-reset: step; }
+  ol.steps li { counter-increment: step; }
+  ol.steps li::before { content: counter(step); display: block; font: 600 1.6rem var(--serif); color: var(--accent); margin-bottom: 6px; }
+  ol.steps h3 { font: 600 1.05rem var(--sans); margin: 0 0 6px; }
+  ol.steps p { margin: 0; color: var(--muted); font-size: 0.97rem; }
+
+  pre.finding { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 28px; overflow-x: auto; font: 400 0.9rem/1.7 var(--mono); white-space: pre-wrap; }
+  pre.finding b { color: var(--accent); font-weight: 600; }
+  .note { color: var(--muted); margin: 20px 0 0; max-width: 44rem; }
+
+  .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+  .three h3 { font: 600 1.15rem var(--serif); margin: 0 0 8px; }
+  .three p { margin: 0; color: var(--muted); }
+  .proof { margin: 40px 0 0; padding: 24px 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; max-width: 46rem; }
+  .proof p { margin: 0; }
+
+  .install pre { margin: 0 0 16px; background: var(--code); border: 1px solid var(--line); border-radius: 8px; padding: 16px 20px; overflow-x: auto; font: 500 0.92rem/1.6 var(--mono); }
+  .install p { color: var(--muted); max-width: 42rem; }
+
+  ul.sources { list-style: none; padding: 0; margin: 0; columns: 2; column-gap: 48px; }
+  ul.sources li { break-inside: avoid; padding: 0 0 16px; }
+  ul.sources span { display: block; color: var(--muted); font-size: 0.93rem; }
+
+  footer { border-top: 1px solid var(--line); padding: 32px 0 56px; color: var(--muted); font-size: 0.93rem; }
+
+  @media (max-width: 860px) {
+    ol.steps, .three { grid-template-columns: 1fr; gap: 28px; }
+    ul.sources { columns: 1; }
+    .hero { padding: 40px 0 64px; }
+    section { padding: 56px 0; }
+  }
+  @media (max-width: 480px) {
+    .wrap { padding: 0 16px; }
+    pre.finding { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="mark" href="./">critique-partner</a>
+    <nav><a href="https://github.com/bbulman/critique-partner">GitHub</a></nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>A design critic that argues from your rules.</h1>
+      <p class="lede">Point it at a URL. It looks at the page, grills you about what the page is for, then writes a critique where every issue quotes one of your own rules word for word, and loops until a script and a second critic can't knock it down. Built for Claude Code.</p>
+      <div class="actions">
+        <a class="button" href="https://github.com/bbulman/critique-partner">Get it on GitHub</a>
+        <code class="cmd">/crit https://your-site.com</code>
+      </div>
+    </div>
+
+    <section aria-labelledby="how">
+      <h2 id="how">What it does, step by step</h2>
+      <p class="intro">You type one command. Everything after it either looks at the page, asks you, or checks the critique.</p>
+      <ol class="steps">
+        <li><h3>Finds your rules</h3><p>It reads the rules you already wrote: taste.md, DESIGN.md, principles.md. No rules, no critique: it asks instead of reaching for generic advice.</p></li>
+        <li><h3>Looks before it asks</h3><p>Headless Chrome screenshots the page at phone and desktop width and measures fonts, colours, contrast, buttons above the fold, shadows, radii and overflow.</p></li>
+        <li><h3>Grills you</h3><p>One question at a time, each with its recommended answer: the page's one job, who's on it, how finished it is, what you want from the crit, what's settled.</p></li>
+        <li><h3>Critiques</h3><p>A fresh agent writes a verdict, a direct answer to your question and the one thing to fix first, then findings that each quote your rule and point at the page.</p></li>
+        <li><h3>Checks against a script</h3><p>A gate fails any quote that isn't word for word in the section it cites, and any page text or selector that isn't on the page.</p></li>
+        <li><h3>Gets a second opinion</h3><p>Another fresh agent tries to prove each serious finding wrong against the screenshots, checks severity and the verdict, and looks for what was missed.</p></li>
+        <li><h3>Loops</h3><p>The critic fixes only what the gate or the second critic flagged. Then both check again, three passes at most.</p></li>
+        <li><h3>Reports</h3><p>The verdict, the answer and what to fix first lead. The serious findings follow in a line each, then what it assumed or couldn't check.</p></li>
+        <li><h3>Keeps going with you</h3><p>Push back and it re-examines on evidence, not pressure. Fix the page, run it again, and round two shows what's fixed and what's new.</p></li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="finding">
+      <h2 id="finding">What a finding looks like</h2>
+      <p class="intro">Every finding names the place, quotes the rule, separates what it saw from why it matters, and suggests a fix you're free to ignore.</p>
+<pre class="finding"><b>### The hero copy sits over a full-bleed image</b>
+<b>Where:</b> 1280-fold.png, hero: "Spark is the powerful, AI-native workspace" (section.hero)
+<b>Rule:</b> "No full-bleed hero images with text overlays." (taste.md § Density &amp; spacing)
+<b>What's wrong:</b> The image failed to load, so the white subhead sits on a white page.
+A visitor deciding in seconds sees a slogan and two buttons, with nothing to judge the trial by.
+<b>Fix:</b> Two grid cells: the copy in ink on one side, the image on the other.</pre>
+      <p class="note">Anything your rules don't cover is a judgment call: labelled, kept apart, three at most, and it never sets the verdict. Ask for rules only and you get none.</p>
+    </section>
+
+    <section aria-labelledby="trust">
+      <h2 id="trust">Why it holds up</h2>
+      <p class="intro">Language models are confident critics and unreliable ones. In Google's UICrit study, 13% of zero-shot UI critiques held up. Three things keep this one honest.</p>
+      <div class="three">
+        <div><h3>The gate is a script</h3><p>Models that correct themselves without outside feedback get worse. This loop runs on checks outside the model: your rule files, the captured page, and a deterministic gate with 55 test cases.</p></div>
+        <div><h3>A second critic</h3><p>Model judges favour their own work. The verifier never sees the first critic's reasoning, only its claims, and has to uphold each one before the loop stops.</p></div>
+        <div><h3>Short and anchored</h3><p>Longer critiques invent more problems. Findings are capped at eight and grouped by rule, and each points at page text or a selector the capture recorded.</p></div>
+      </div>
+      <div class="proof"><p>On the test page, the loop took all three passes. The second critic caught five factual slips, among them a button placed on the wrong screenshot, a 56px headline reported as 48px, and a black background that wasn't there. Each was fixed before the critique was shown.</p></div>
+    </section>
+
+    <section aria-labelledby="install" class="install">
+      <h2 id="install">Install</h2>
+      <p class="intro">You need Claude Code, Node 18 or later, and Playwright with Chromium.</p>
+<pre>npm i -g playwright &amp;&amp; npx playwright install chromium</pre>
+<pre>git clone https://github.com/bbulman/critique-partner.git
+cd critique-partner
+./install.sh</pre>
+      <p>Open a new Claude Code session and run <code>/crit</code> on a page. Try the <a href="https://github.com/bbulman/critique-partner/tree/main/example">example</a> first: a landing page built with thirteen planted violations of its own rules.</p>
+    </section>
+
+    <section aria-labelledby="sources">
+      <h2 id="sources">What it's built on</h2>
+      <p class="intro">Each design choice answers a finding from the research on critique, human and machine.</p>
+      <ul class="sources">
+        <li><a href="https://lizlerman.com/critical-response-process/">Liz Lerman's Critical Response Process</a><span>It answers your question first, and opinions are opt-in.</span></li>
+        <li>Adam Connor and Aaron Irizarry, <i>Discussing Design</i><span>Every finding ties what it saw to the page's job.</span></li>
+        <li><a href="https://doi.org/10.1007/s10459-012-9377-9">Parkes et al. on the compliment sandwich</a><span>What works is a list to protect, never padding around the problems.</span></li>
+        <li>Ed Catmull on Pixar's Braintrust<span>The diagnosis is the deliverable; the fix is a suggestion.</span></li>
+        <li><a href="https://arxiv.org/abs/2310.01798">Huang et al. 2023</a><span>Self-correction needs outside feedback, so the loop runs on a gate.</span></li>
+        <li><a href="https://arxiv.org/abs/2303.17651">Self-Refine</a><span>Most gains come early: three passes at most.</span></li>
+        <li><a href="https://arxiv.org/abs/2306.05685">Zheng et al. 2023</a><span>Judges favour their own output, so a fresh critic verifies.</span></li>
+        <li><a href="https://arxiv.org/abs/2407.00215">CriticGPT</a><span>Long critiques invent more problems: findings are capped.</span></li>
+        <li><a href="https://arxiv.org/abs/2407.08850">UICrit</a><span>Models can't locate elements from screenshots, so findings point at the DOM.</span></li>
+        <li><a href="https://www.anthropic.com/engineering/building-effective-agents">Building effective agents</a><span>The evaluator-optimizer loop, with ground truth at every step.</span></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    MIT licence. Made by Bill Bulman. <a href="https://github.com/bbulman/critique-partner">Source on GitHub</a>.
+  </footer>
+</div>
+</body>
+</html>

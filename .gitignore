@@ -1,0 +1,8 @@
+# Rounds a crit writes while you try the example
+.critiques/
+.scratch/
+critiques/
+
+node_modules/
+.DS_Store
+.omc/
