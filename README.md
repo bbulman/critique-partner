@@ -1,5 +1,7 @@
 # critique-partner
 
+![critique-partner: a design critic that argues from your rules](.github/social-preview.png)
+
 A design critic for [Claude Code](https://claude.com/claude-code) that argues from your rules, not from generic best practice.
 
 Point it at a URL. It looks at the page, grills you about what the page is for and what you want from the crit, then writes a critique where every issue quotes one of your own rules word for word. Then it loops: a script checks every quote and every claim about the page, a second critic tries to knock the serious findings down, and the first critic fixes only what they caught, until the critique holds up.
