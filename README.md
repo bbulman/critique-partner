@@ -162,4 +162,4 @@ node skills/crit/scripts/check.mjs --selftest
 
 ## License
 
-MIT. Made by Bill Bulman.
+MIT. Made by [Workshopr.io](https://workshopr.io).
