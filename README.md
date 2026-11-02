@@ -30,6 +30,7 @@ cd critique-partner
 
 It copies the agent to `~/.claude/agents/` and the skill to `~/.claude/skills/crit/`, keeping any earlier copy as a backup. Open a new Claude Code session (or type `/reload-skills`), and run `/crit` on a page.
 
+
 ## What it does, step by step
 
 1. **Finds your rules.** It reads the design rules your project already wrote down: `taste.md` for judgment, `DESIGN.md` for rules, `principles.md`, `.claude/rules/design-principles.md`. It skips a file that only points somewhere else, and asks you when it finds none.
@@ -64,6 +65,7 @@ Language models are confident critics and unreliable ones. In Google's UICrit st
 - **Short and anchored.** Longer critiques invent more bugs and nitpicks ([CriticGPT](https://arxiv.org/abs/2407.00215)), and models can't locate elements from a screenshot ([UICrit](https://arxiv.org/abs/2407.08850)). So findings are capped at 8, grouped by rule, and every one points at page text or a selector the capture recorded.
 
 In testing on the example page, the loop took all three passes. The second critic caught five factual slips (a button placed on the wrong screenshot, a 56px headline reported as 48px, a black background that didn't exist), and each was fixed before the critique was shown.
+
 
 ## Use
 
